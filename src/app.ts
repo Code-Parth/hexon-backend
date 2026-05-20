@@ -254,7 +254,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
   bearerFormat: "Privy access token",
 });
 
-function stubTx(action: string) {
+function _stubTx(action: string) {
   return {
     requestId: crypto.randomUUID(),
     network: getSolanaNetwork(),

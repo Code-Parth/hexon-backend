@@ -10,19 +10,16 @@
 //   7. Backend captures the transaction via a forwarder, encodes it to base64, returns to iOS.
 //   8. iOS calls decodeBackendTransaction to strip the placeholder sig, re-signs with Privy.
 
-import {
-  getUmbraClient,
+import { getUmbraClient } from "@umbra-privacy/sdk";
+import type {
   IUmbraSigner,
   SignableTransaction,
   SignedTransaction,
   TransactionForwarder,
   TransactionSignature,
 } from "@umbra-privacy/sdk";
-import {
-  getDefaultMasterSeedGenerator,
-  GetUmbraClientDeps,
-  SignedMessage,
-} from "@umbra-privacy/sdk/client";
+import { getDefaultMasterSeedGenerator } from "@umbra-privacy/sdk/client";
+import type { GetUmbraClientDeps, SignedMessage } from "@umbra-privacy/sdk/client";
 import { getUserRegistrationFunction } from "@umbra-privacy/sdk/registration";
 import { getATAIntoETADirectDepositorFunction } from "@umbra-privacy/sdk/deposit";
 import { getETAIntoATAWithdrawerFunction } from "@umbra-privacy/sdk/withdrawal";
@@ -103,21 +100,21 @@ function createSignerForWallet(
     // Called by getDefaultMasterSeedGenerator to produce the master seed.
     // We return the exact iOS-provided signature so the SDK derives the
     // same master seed that the user's Privy wallet would produce.
-    signMessage: async (message: Uint8Array): Promise<SignedMessage> => ({
-      message,
-      signature: iosSignatureBytes as SignatureBytes,
-      signer: address,
-    }),
+    signMessage: (message: Uint8Array): Promise<SignedMessage> =>
+      Promise.resolve({
+        message,
+        signature: iosSignatureBytes as SignatureBytes,
+        signer: address,
+      }),
 
     // Called by the SDK to sign the compiled transaction.
     // We add a 64-byte zero placeholder keyed to the user's address.
-    signTransaction: async (
-      tx: SignableTransaction,
-    ): Promise<SignedTransaction> => spoofSign(tx),
+    signTransaction: (tx: SignableTransaction): Promise<SignedTransaction> =>
+      Promise.resolve(spoofSign(tx)),
 
-    signTransactions: async (
+    signTransactions: (
       txs: readonly SignableTransaction[],
-    ): Promise<SignedTransaction[]> => txs.map(spoofSign),
+    ): Promise<SignedTransaction[]> => Promise.resolve(txs.map(spoofSign)),
   };
 }
 
@@ -156,8 +153,8 @@ async function buildUmbraClient(
 
   const deps = {
     masterSeedStorage: {
-      load: async () => ({ exists: false as const }),
-      store: async () => ({ success: true as const }),
+      load: () => Promise.resolve({ exists: false as const }),
+      store: () => Promise.resolve({ success: true as const }),
       generate: masterSeedGenerator,
     },
   } satisfies GetUmbraClientDeps;
@@ -173,16 +170,16 @@ async function buildUmbraClient(
 function makeCaptureForwarder() {
   const captured: SignedTransaction[] = [];
   const forwarder: TransactionForwarder = {
-    forwardSequentially: async (transactions: readonly SignedTransaction[]) => {
+    forwardSequentially: (transactions: readonly SignedTransaction[]) => {
       captured.push(...transactions);
-      return transactions.map(() => "CAPTURED" as TransactionSignature);
+      return Promise.resolve(transactions.map(() => "CAPTURED" as TransactionSignature));
     },
-    forwardInParallel: async (transactions: readonly SignedTransaction[]) => {
+    forwardInParallel: (transactions: readonly SignedTransaction[]) => {
       captured.push(...transactions);
-      return transactions.map(() => "CAPTURED" as TransactionSignature);
+      return Promise.resolve(transactions.map(() => "CAPTURED" as TransactionSignature));
     },
-    fireAndForget: async (): Promise<TransactionSignature> =>
-      "CAPTURED" as TransactionSignature,
+    fireAndForget: (): Promise<TransactionSignature> =>
+      Promise.resolve("CAPTURED" as TransactionSignature),
   };
   return { forwarder, getCaptured: () => [...captured] };
 }
