@@ -1,5 +1,4 @@
-import { getUserAccountQuerierFunction } from "@umbra-privacy/sdk/query";
-import { getUserRegistrationFunction } from "@umbra-privacy/sdk/registration";
+import { getUserAccountQuerierFunction, getUserRegistrationFunction } from "@umbra-privacy/sdk";
 import { getDevnetUmbraClient, jsonSafe, printUmbraError } from "./lib.js";
 
 const confidential = process.env.UMBRA_CONFIDENTIAL !== "false";

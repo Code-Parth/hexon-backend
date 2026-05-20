@@ -1,4 +1,4 @@
-import { getUserAccountQuerierFunction } from "@umbra-privacy/sdk/query";
+import { getUserAccountQuerierFunction } from "@umbra-privacy/sdk";
 import { getDevnetUmbraClient, jsonSafe } from "./lib.js";
 
 const client = await getDevnetUmbraClient();

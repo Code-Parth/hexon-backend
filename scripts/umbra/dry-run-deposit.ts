@@ -1,9 +1,6 @@
-import { getATAIntoETADirectDepositorFunction } from "@umbra-privacy/sdk/deposit";
-import type {
-  IUmbraSigner,
-  SignedTransaction,
-  TransactionSignature,
-} from "@umbra-privacy/sdk";
+import { getPublicBalanceToEncryptedBalanceDirectDepositorFunction } from "@umbra-privacy/sdk";
+import type { IUmbraSigner } from "@umbra-privacy/sdk/interfaces";
+import type { SignedTransaction, TransactionSignature } from "@umbra-privacy/sdk/types";
 import {
   getDevnetUmbraClient,
   getDevnetUsdcMintOrThrow,
@@ -21,7 +18,7 @@ if (amount <= 0n) {
 
 const client = await getDevnetUmbraClient();
 const mint = getDevnetUsdcMintOrThrow();
-const deposit = getATAIntoETADirectDepositorFunction(
+const deposit = getPublicBalanceToEncryptedBalanceDirectDepositorFunction(
   { client },
   {
     rpc: {

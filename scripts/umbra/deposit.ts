@@ -1,5 +1,5 @@
-import { getATAIntoETADirectDepositorFunction } from "@umbra-privacy/sdk/deposit";
-import type { IUmbraSigner } from "@umbra-privacy/sdk";
+import { getPublicBalanceToEncryptedBalanceDirectDepositorFunction } from "@umbra-privacy/sdk";
+import type { IUmbraSigner } from "@umbra-privacy/sdk/interfaces";
 import {
   getDevnetUmbraClient,
   getDevnetUsdcMintOrThrow,
@@ -16,7 +16,7 @@ if (amount <= 0n) {
 
 const client = await getDevnetUmbraClient();
 const mint = getDevnetUsdcMintOrThrow();
-const deposit = getATAIntoETADirectDepositorFunction({ client });
+const deposit = getPublicBalanceToEncryptedBalanceDirectDepositorFunction({ client });
 
 console.log(`Umbra network: ${client.network}`);
 console.log(`Umbra program: ${client.networkConfig.programId}`);
